@@ -63,10 +63,18 @@ Hint: you'll probably still need to use .map.
     .then(function(response) {
 
       addSearchHeader(response.query);
+      //since map returns an array we can pass it directly to the Promise.all
+      //since it's looking for an array of promises
+      return Promise.all(response.results.map(getJSON));
+    }).then(function(planetData){
 
-      response.results.map(function(url) {
-        getJSON(url).then(createPlanetThumb);
+      planetData.forEach(function(planet){
+        console.log(planet);
+        createPlanetThumb(planet);
       });
-    });
+    })
+    .catch(function(e){
+      console.log(e);
+    })
   });
 })(document);
