@@ -64,9 +64,22 @@ Instructions:
      */
     getJSON('../data/earth-like-results.json')
     .then(function(response) {
-      response.results.forEach(function(url) {
-        getJSON(url).then(createPlanetThumb);
+      //create a self resolving promise to initiate the chain
+      //of promises that will be created in the forEach loop
+      var sequence = Promise.resolve();
+
+      response.results.forEach(function(url){
+        //this ensures that sequences get chained together in order
+        //so your fetch and createthumbnail functions execute in the same
+        //order as the data
+        sequence = sequence.then(function(){
+          return getJSON(url);
+        }).then(createPlanetThumb);
+        
       });
+      
+    }).catch(function(e){
+      console.log(e);
     });
   });
 })(document);
